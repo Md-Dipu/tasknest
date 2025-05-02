@@ -1,0 +1,15 @@
+<header class="bg-indigo-600 text-white shadow-md">
+  <nav class="container mx-auto px-4 py-4 flex justify-between items-center">
+    <a href="/" class="text-2xl font-bold">tasknest</a>
+    <div class="space-x-4">
+      <a href="/" class="hover:text-gray-200">Home</a>
+      <% if (user) { %>
+      <a href="/dashboard" class="hover:text-gray-200">Dashboard</a>
+      <a href="/logout" class="hover:text-gray-200">Logout</a>
+      <% } else { %>
+      <a href="/login" class="hover:text-gray-200">Login</a>
+      <a href="/register" class="hover:text-gray-200">Register</a>
+      <% } %>
+    </div>
+  </nav>
+</header>

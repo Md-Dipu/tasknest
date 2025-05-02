@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>tasknest</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  </head>
+  <body class="bg-gray-50">
+    <%- include('partials/header') %>
+    <main class="container mx-auto px-4 py-12 text-center">
+      <h1 class="text-4xl font-bold text-gray-800 mb-4">Welcome to tasknest</h1>
+      <p class="text-lg text-gray-600 mb-6">
+        Your personalized task manager for students, professionals, and
+        religious individuals.
+      </p>
+      <div class="space-x-4">
+        <a
+          href="/login"
+          class="inline-block bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700"
+          >Login</a
+        >
+        <a
+          href="/register"
+          class="inline-block bg-gray-200 text-gray-800 px-6 py-2 rounded-md hover:bg-gray-300"
+          >Register</a
+        >
+      </div>
+    </main>
+    <%- include('partials/footer') %>
+  </body>
+</html>
