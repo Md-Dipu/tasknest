@@ -50,6 +50,9 @@ function openTaskModal(
 
   // Set form action
   document.getElementById('taskForm').action = `/tasks/update/${id}`;
+
+  // Show comments tab by default
+  showTab('comments');
 }
 
 function closeTaskModal() {
@@ -77,4 +80,23 @@ function addSubtask(
     <button type="button" onclick="this.parentElement.remove()" class="text-red-500 hover:text-red-700">Remove</button>
   `;
   subtasksContainer.appendChild(subtaskDiv);
+}
+
+function showTab(tabName) {
+  const commentsTab = document.getElementById('commentsTab');
+  const worklogTab = document.getElementById('worklogTab');
+  const commentsButton = document.querySelector('.comments-tab');
+  const worklogButton = document.querySelector('.worklog-tab');
+
+  if (tabName === 'comments') {
+    commentsTab.classList.remove('hidden');
+    worklogTab.classList.add('hidden');
+    commentsButton.classList.add('border-indigo-600');
+    worklogButton.classList.remove('border-indigo-600');
+  } else {
+    commentsTab.classList.add('hidden');
+    worklogTab.classList.remove('hidden');
+    commentsButton.classList.remove('border-indigo-600');
+    worklogButton.classList.add('border-indigo-600');
+  }
 }
