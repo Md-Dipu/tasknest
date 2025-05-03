@@ -1,6 +1,7 @@
 const express = require('express');
 const session = require('express-session');
 const passport = require('passport');
+const morgan = require('morgan');
 const connectDB = require('./config/database');
 const authRoutes = require('./routes/authRoutes');
 const taskRoutes = require('./routes/taskRoutes');
@@ -15,6 +16,7 @@ const app = express();
 connectDB();
 
 // Middleware
+app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
 app.use(
   session({
