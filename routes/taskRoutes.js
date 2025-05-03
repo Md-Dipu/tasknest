@@ -12,6 +12,7 @@ const ensureAuthenticated = (req, res, next) => {
 
 // Task routes
 router.post('/add', ensureAuthenticated, taskController.addTask);
+router.post('/update/:id', ensureAuthenticated, taskController.updateTask);
 router.post('/delete/:id', ensureAuthenticated, taskController.deleteTask);
 
 module.exports = router;

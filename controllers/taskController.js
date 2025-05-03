@@ -11,16 +11,66 @@ exports.getTasks = async (req, res) => {
 };
 
 exports.addTask = async (req, res) => {
-  const { title, description, priority, dueDate } = req.body;
+  const { title } = req.body;
   try {
     const task = new Task({
       title,
-      description,
-      priority,
-      dueDate: dueDate ? new Date(dueDate) : null,
       user: req.user._id,
     });
     await task.save();
+    res.redirect('/dashboard');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server error');
+  }
+};
+
+exports.updateTask = async (req, res) => {
+  const { id } = req.params;
+  const { description, priority, dueDate, status, subtasks, comment, worklog } =
+    req.body;
+  try {
+    const updateData = {};
+    if (description) updateData.description = description;
+    if (priority) updateData.priority = priority;
+    if (dueDate) updateData.dueDate = dueDate ? new Date(dueDate) : null;
+    if (status) updateData.status = status;
+
+    // Handle subtasks
+    if (subtasks) {
+      const subtaskArray = Array.isArray(subtasks.title)
+        ? subtasks.title
+        : [subtasks.title];
+      const subtaskUpdates = subtaskArray.map((title, index) => ({
+        title,
+        description: Array.isArray(subtasks.description)
+          ? subtasks.description[index]
+          : subtasks.description,
+        status: Array.isArray(subtasks.status)
+          ? subtasks.status[index]
+          : subtasks.status,
+      }));
+      updateData.subtasks = subtaskUpdates.filter((st) => st.title); // Only include valid subtasks
+    }
+
+    // Handle comments
+    if (comment) {
+      updateData.comments = [{ text: comment }];
+    }
+
+    // Handle worklog
+    if (worklog) {
+      updateData.worklog = [{ duration: parseInt(worklog, 10) }];
+    }
+
+    await Task.findOneAndUpdate(
+      { _id: id, user: req.user._id },
+      {
+        $set: updateData,
+        $push: { comments: updateData.comments, worklog: updateData.worklog },
+      },
+      { new: true, runValidators: true }
+    );
     res.redirect('/dashboard');
   } catch (err) {
     console.error(err);
