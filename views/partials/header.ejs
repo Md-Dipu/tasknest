@@ -5,10 +5,10 @@
       <a href="/" class="hover:text-gray-200">Home</a>
       <% if (user) { %>
       <a href="/dashboard" class="hover:text-gray-200">Dashboard</a>
-      <a href="/logout" class="hover:text-gray-200">Logout</a>
+      <a href="/auth/logout" class="hover:text-gray-200">Logout</a>
       <% } else { %>
-      <a href="/login" class="hover:text-gray-200">Login</a>
-      <a href="/register" class="hover:text-gray-200">Register</a>
+      <a href="/auth/login" class="hover:text-gray-200">Login</a>
+      <a href="/auth/register" class="hover:text-gray-200">Register</a>
       <% } %>
     </div>
   </nav>

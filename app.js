@@ -3,6 +3,8 @@ const session = require('express-session');
 const passport = require('passport');
 const connectDB = require('./config/database');
 const authRoutes = require('./routes/authRoutes');
+const taskRoutes = require('./routes/taskRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcryptjs');
 const User = require('./models/User');
@@ -65,15 +67,10 @@ passport.deserializeUser(async (id, done) => {
 });
 
 // Routes
-app.use('/', authRoutes);
-
-app.get('/dashboard', (req, res) => {
-  if (!req.isAuthenticated()) {
-    return res.redirect('/login');
-  }
-  const userType = req.user.userType;
-  res.render(`dashboard/${userType}`, { user: req.user });
-});
+app.get('/', (req, res) => res.render('index', { user: req.user }));
+app.use('/auth', authRoutes);
+app.use('/tasks', taskRoutes);
+app.use('/', dashboardRoutes);
 
 // Start server
 const PORT = process.env.PORT || 3000;

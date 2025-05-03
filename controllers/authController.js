@@ -13,7 +13,7 @@ exports.register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
     user = new User({ username, email, password: hashedPassword, userType });
     await user.save();
-    res.redirect('/login');
+    res.redirect('/auth/login');
   } catch (err) {
     res.status(500).send('Server error');
   }
@@ -22,7 +22,7 @@ exports.register = async (req, res) => {
 exports.login = (req, res, next) => {
   passport.authenticate('local', {
     successRedirect: '/dashboard',
-    failureRedirect: '/login',
+    failureRedirect: '/auth/login',
     failureFlash: false,
   })(req, res, next);
 };
