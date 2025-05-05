@@ -14,6 +14,7 @@ const commentSchema = new mongoose.Schema({
 
 const worklogSchema = new mongoose.Schema({
   duration: { type: Number, required: true }, // Duration in minutes
+  description: { type: String },
   createdAt: { type: Date, default: Date.now },
 });
 

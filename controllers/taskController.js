@@ -27,8 +27,16 @@ exports.addTask = async (req, res) => {
 
 exports.updateTask = async (req, res) => {
   const { id } = req.params;
-  const { description, priority, dueDate, status, subtasks, comment, worklog } =
-    req.body;
+  const {
+    description,
+    priority,
+    dueDate,
+    status,
+    subtasks,
+    comment,
+    worklog,
+    worklogDescription,
+  } = req.body;
   try {
     const updateData = {};
     if (description) updateData.description = description;
@@ -45,29 +53,32 @@ exports.updateTask = async (req, res) => {
         title,
         description: Array.isArray(subtasks.description)
           ? subtasks.description[index]
-          : subtasks.description,
+          : subtasks.description || '',
         status: Array.isArray(subtasks.status)
           ? subtasks.status[index]
-          : subtasks.status,
+          : subtasks.status || 'pending',
       }));
       updateData.subtasks = subtaskUpdates.filter((st) => st.title); // Only include valid subtasks
     }
 
-    // Handle comments
+    // Prepare push operations for comments and worklog
+    const pushData = {};
     if (comment) {
-      updateData.comments = [{ text: comment }];
+      pushData.comments = { text: comment };
     }
-
-    // Handle worklog
     if (worklog) {
-      updateData.worklog = [{ duration: parseInt(worklog, 10) }];
+      pushData.worklog = {
+        duration: parseInt(worklog, 10),
+        description: worklogDescription || '',
+      };
     }
 
+    // Perform update
     await Task.findOneAndUpdate(
       { _id: id, user: req.user._id },
       {
         $set: updateData,
-        $push: { comments: updateData.comments, worklog: updateData.worklog },
+        $push: pushData,
       },
       { new: true, runValidators: true }
     );

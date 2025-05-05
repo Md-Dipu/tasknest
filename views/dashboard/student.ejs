@@ -39,6 +39,74 @@
         </form>
       </div>
 
+      <!-- Task Details (Displayed Above Task List) -->
+      <% if (tasks.length > 0) { %>
+      <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+        <h2 class="text-xl font-semibold text-gray-700 mb-4">Task Details</h2>
+        <% tasks.forEach(task => { %>
+        <div class="mb-6">
+          <h3 class="text-lg font-medium text-gray-800"><%= task.title %></h3>
+          <% if (task.description) { %>
+          <p class="text-gray-600"><%= task.description %></p>
+          <% } %>
+          <p class="text-sm text-gray-500">
+            Status: <%= task.status.charAt(0).toUpperCase() +
+            task.status.slice(1).replace('_', ' ') %>
+          </p>
+          <p class="text-sm text-gray-500">
+            Priority: <%= task.priority.charAt(0).toUpperCase() +
+            task.priority.slice(1) %>
+          </p>
+          <% if (task.dueDate) { %>
+          <p class="text-sm text-gray-500">
+            Due: <%= new Date(task.dueDate).toLocaleDateString() %>
+          </p>
+          <% } %> <% if (task.subtasks.length > 0) { %>
+          <div class="mt-2">
+            <h4 class="text-sm font-medium text-gray-700">Subtasks:</h4>
+            <ul class="list-disc pl-5">
+              <% task.subtasks.forEach(subtask => { %>
+              <li class="text-sm text-gray-600">
+                <input type="checkbox" disabled <%= subtask.status === 'done' ?
+                'checked' : '' %>> <%= subtask.title %> <% if
+                (subtask.description) { %>
+                <span class="text-gray-500">(<%= subtask.description %>)</span>
+                <% } %>
+              </li>
+              <% }) %>
+            </ul>
+          </div>
+          <% } %> <% if (task.comments.length > 0) { %>
+          <div class="mt-2">
+            <h4 class="text-sm font-medium text-gray-700">Comments:</h4>
+            <ul class="list-disc pl-5">
+              <% task.comments.forEach(comment => { %>
+              <li class="text-sm text-gray-600">
+                <%= comment.text %> (<%= new
+                Date(comment.createdAt).toLocaleString() %>)
+              </li>
+              <% }) %>
+            </ul>
+          </div>
+          <% } %> <% if (task.worklog.length > 0) { %>
+          <div class="mt-2">
+            <h4 class="text-sm font-medium text-gray-700">Worklog:</h4>
+            <ul class="list-disc pl-5">
+              <% task.worklog.forEach(log => { %>
+              <li class="text-sm text-gray-600">
+                <%= log.duration %> minutes <% if (log.description) { %>
+                <span class="text-gray-500">(<%= log.description %>)</span>
+                <% } %> (<%= new Date(log.createdAt).toLocaleString() %>)
+              </li>
+              <% }) %>
+            </ul>
+          </div>
+          <% } %>
+        </div>
+        <% }) %>
+      </div>
+      <% } %>
+
       <!-- Task List -->
       <div class="bg-white p-6 rounded-lg shadow-md">
         <h2 class="text-xl font-semibold text-gray-700 mb-4">Your Tasks</h2>
@@ -93,10 +161,10 @@
       <!-- Task Modal -->
       <div
         id="taskModal"
-        class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50"
+        class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50 transition-opacity duration-300"
       >
         <div
-          class="bg-white rounded-lg shadow-xl w-full max-w-4xl flex max-h-[80vh]"
+          class="bg-white rounded-lg shadow-xl w-full max-w-4xl flex max-h-[80vh] transform transition-transform duration-300 scale-95"
         >
           <!-- Main Content -->
           <div class="w-2/3 p-6 overflow-y-auto">
@@ -176,6 +244,17 @@
                     id="worklog"
                     class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-600"
                   />
+                  <label
+                    for="worklogDescription"
+                    class="block text-sm font-medium text-gray-700 mt-2"
+                    >Worklog Description</label
+                  >
+                  <textarea
+                    name="worklogDescription"
+                    id="worklogDescription"
+                    rows="2"
+                    class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-600"
+                  ></textarea>
                   <div id="worklogContainer" class="mt-2 space-y-2"></div>
                 </div>
               </div>

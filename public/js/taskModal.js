@@ -9,7 +9,21 @@ function openTaskModal(
   comments,
   worklog
 ) {
-  document.getElementById('taskModal').classList.remove('hidden');
+  const modal = document.getElementById('taskModal');
+  const modalContent = modal.querySelector('.bg-white');
+
+  // Reset animation classes
+  modal.classList.remove('opacity-0');
+  modalContent.classList.remove('scale-95');
+
+  // Show modal with animation
+  modal.classList.remove('hidden');
+  setTimeout(() => {
+    modal.classList.add('opacity-100');
+    modalContent.classList.add('scale-100');
+  }, 10);
+
+  // Populate fields
   document.getElementById('modalTitle').textContent = title;
   document.getElementById('taskId').value = id;
   document.getElementById('description').value = description;
@@ -42,9 +56,9 @@ function openTaskModal(
   worklog.forEach((log) => {
     const div = document.createElement('div');
     div.className = 'text-sm text-gray-600';
-    div.textContent = `${log.duration} minutes (${new Date(
-      log.createdAt
-    ).toLocaleString()})`;
+    div.textContent = `${log.duration} minutes ${
+      log.description ? `(${log.description})` : ''
+    } (${new Date(log.createdAt).toLocaleString()})`;
     worklogContainer.appendChild(div);
   });
 
@@ -56,7 +70,19 @@ function openTaskModal(
 }
 
 function closeTaskModal() {
-  document.getElementById('taskModal').classList.add('hidden');
+  const modal = document.getElementById('taskModal');
+  const modalContent = modal.querySelector('.bg-white');
+
+  // Animate out
+  modal.classList.remove('opacity-100');
+  modalContent.classList.remove('scale-100');
+  modal.classList.add('opacity-0');
+  modalContent.classList.add('scale-95');
+
+  // Hide after animation
+  setTimeout(() => {
+    modal.classList.add('hidden');
+  }, 300);
 }
 
 function addSubtask(
@@ -67,16 +93,13 @@ function addSubtask(
 ) {
   const subtasksContainer = document.getElementById('subtasksContainer');
   const subtaskDiv = document.createElement('div');
-  subtaskDiv.className = 'space-y-2 border p-2 rounded-md';
+  subtaskDiv.className = 'flex items-center space-x-2 border p-2 rounded-md';
   subtaskDiv.innerHTML = `
-    <input type="text" name="subtasks[title][]" value="${title}" placeholder="Subtask Title" required class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-600">
+    <input type="checkbox" name="subtasks[status][]" value="done" ${
+      status === 'done' ? 'checked' : ''
+    } class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+    <input type="text" name="subtasks[title][]" value="${title}" placeholder="Subtask Title" required class="flex-1 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-600">
     <textarea name="subtasks[description][]" placeholder="Subtask Description" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-600">${description}</textarea>
-    <select name="subtasks[status][]" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-600">
-      <option value="pending" ${
-        status === 'pending' ? 'selected' : ''
-      }>Pending</option>
-      <option value="done" ${status === 'done' ? 'selected' : ''}>Done</option>
-    </select>
     <button type="button" onclick="this.parentElement.remove()" class="text-red-500 hover:text-red-700">Remove</button>
   `;
   subtasksContainer.appendChild(subtaskDiv);
