@@ -89,6 +89,36 @@ exports.updateTask = async (req, res) => {
   }
 };
 
+exports.updateTaskField = async (req, res) => {
+  const { id } = req.params;
+  const { field, value } = req.body;
+  try {
+    const updateData = {};
+    if (field === 'dueDate') {
+      updateData[field] = value ? new Date(value) : null;
+    } else if (['priority', 'status'].includes(field)) {
+      updateData[field] = value;
+    } else {
+      return res.status(400).json({ error: 'Invalid field' });
+    }
+
+    const task = await Task.findOneAndUpdate(
+      { _id: id, user: req.user._id },
+      { $set: updateData },
+      { new: true, runValidators: true }
+    );
+
+    if (!task) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
 exports.deleteTask = async (req, res) => {
   const { id } = req.params;
   try {

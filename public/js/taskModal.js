@@ -123,3 +123,27 @@ function showTab(tabName) {
     worklogButton.classList.add('border-indigo-600');
   }
 }
+
+async function updateTaskField(element, field) {
+  const taskId = document.getElementById('taskId').value;
+  const value = element.value;
+
+  try {
+    const response = await fetch(`/tasks/update/${taskId}/field`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ field, value }),
+    });
+
+    const result = await response.json();
+    if (!result.success) {
+      console.error('Update failed:', result.error);
+      alert('Failed to update task field');
+    }
+  } catch (err) {
+    console.error('Error updating task field:', err);
+    alert('Error updating task field');
+  }
+}

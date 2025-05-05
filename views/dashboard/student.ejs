@@ -290,6 +290,7 @@
                 <select
                   name="priority"
                   id="priority"
+                  onchange="updateTaskField(this, 'priority')"
                   class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-600"
                 >
                   <option value="low">Low</option>
@@ -306,6 +307,7 @@
                 <select
                   name="status"
                   id="status"
+                  onchange="updateTaskField(this, 'status')"
                   class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-600"
                 >
                   <option value="pending">Pending</option>
@@ -324,6 +326,7 @@
                   type="date"
                   name="dueDate"
                   id="dueDate"
+                  onchange="updateTaskField(this, 'dueDate')"
                   class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-600"
                 />
               </div>
