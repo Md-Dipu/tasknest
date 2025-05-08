@@ -7,7 +7,8 @@ function openTaskModal(
   status,
   subtasks,
   comments,
-  worklog
+  worklog,
+  listId
 ) {
   const modal = document.getElementById('taskModal');
   const modalContent = modal.querySelector('.bg-white');
@@ -30,6 +31,7 @@ function openTaskModal(
   document.getElementById('priority').value = priority;
   document.getElementById('dueDate').value = dueDate;
   document.getElementById('status').value = status;
+  document.getElementById('listId').value = listId;
 
   // Populate subtasks
   const subtasksContainer = document.getElementById('subtasksContainer');

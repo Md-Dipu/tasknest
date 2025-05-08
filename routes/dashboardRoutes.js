@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const taskController = require('../controllers/taskController');
+const dashboardController = require('../controllers/dashboardController');
 
 // Middleware to ensure user is authenticated
 const ensureAuthenticated = (req, res, next) => {
@@ -11,11 +11,6 @@ const ensureAuthenticated = (req, res, next) => {
 };
 
 // Dashboard route
-router.get('/dashboard', ensureAuthenticated, (req, res) => {
-  if (req.user.userType === 'student') {
-    return taskController.getTasks(req, res);
-  }
-  res.render(`dashboard/${req.user.userType}`, { user: req.user, tasks: [] });
-});
+router.get('/', ensureAuthenticated, dashboardController.getDashboard);
 
 module.exports = router;

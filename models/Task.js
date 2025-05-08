@@ -32,6 +32,7 @@ const taskSchema = new mongoose.Schema({
     enum: ['pending', 'in_progress', 'done', 'skip'],
     default: 'pending',
   },
+  list: { type: mongoose.Schema.Types.ObjectId, ref: 'List', required: true },
   subtasks: [subtaskSchema],
   comments: [commentSchema],
   worklog: [worklogSchema],

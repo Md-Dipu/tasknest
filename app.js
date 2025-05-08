@@ -6,6 +6,7 @@ const connectDB = require('./config/database');
 const authRoutes = require('./routes/authRoutes');
 const taskRoutes = require('./routes/taskRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
+const listRoutes = require('./routes/listRoutes');
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcryptjs');
 const User = require('./models/User');
@@ -72,8 +73,9 @@ passport.deserializeUser(async (id, done) => {
 // Routes
 app.get('/', (req, res) => res.render('index', { user: req.user }));
 app.use('/auth', authRoutes);
+app.use('/dashboard', dashboardRoutes);
+app.use('/lists', listRoutes);
 app.use('/tasks', taskRoutes);
-app.use('/', dashboardRoutes);
 
 // Start server
 const PORT = process.env.PORT || 3000;

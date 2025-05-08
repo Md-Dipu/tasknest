@@ -1,9 +1,11 @@
 const Task = require('../models/Task');
+const List = require('../models/List');
 
 exports.getTasks = async (req, res) => {
   try {
     const tasks = await Task.find({ user: req.user._id });
-    res.render('dashboard/student', { user: req.user, tasks });
+    const lists = await List.find({ user: req.user._id });
+    res.render('dashboard/student', { user: req.user, tasks, lists });
   } catch (err) {
     console.error(err);
     res.status(500).send('Server error');
@@ -11,10 +13,25 @@ exports.getTasks = async (req, res) => {
 };
 
 exports.addTask = async (req, res) => {
-  const { title } = req.body;
+  const { title, listId } = req.body;
   try {
+    let list = listId
+      ? await List.findOne({ _id: listId, user: req.user._id })
+      : null;
+    if (!list) {
+      list = await List.findOne({ user: req.user._id, isDefault: true });
+      if (!list) {
+        list = new List({
+          name: 'Default',
+          isDefault: true,
+          user: req.user._id,
+        });
+        await list.save();
+      }
+    }
     const task = new Task({
       title,
+      list: list._id,
       user: req.user._id,
     });
     await task.save();
@@ -32,6 +49,7 @@ exports.updateTask = async (req, res) => {
     priority,
     dueDate,
     status,
+    listId,
     subtasks,
     comment,
     worklog,
@@ -43,6 +61,7 @@ exports.updateTask = async (req, res) => {
     if (priority) updateData.priority = priority;
     if (dueDate) updateData.dueDate = dueDate ? new Date(dueDate) : null;
     if (status) updateData.status = status;
+    if (listId) updateData.list = listId;
 
     // Handle subtasks
     if (subtasks) {
@@ -58,7 +77,7 @@ exports.updateTask = async (req, res) => {
           ? subtasks.status[index]
           : subtasks.status || 'pending',
       }));
-      updateData.subtasks = subtaskUpdates.filter((st) => st.title); // Only include valid subtasks
+      updateData.subtasks = subtaskUpdates.filter((st) => st.title);
     }
 
     // Prepare push operations for comments and worklog
@@ -73,7 +92,6 @@ exports.updateTask = async (req, res) => {
       };
     }
 
-    // Perform update
     await Task.findOneAndUpdate(
       { _id: id, user: req.user._id },
       {
@@ -96,7 +114,7 @@ exports.updateTaskField = async (req, res) => {
     const updateData = {};
     if (field === 'dueDate') {
       updateData[field] = value ? new Date(value) : null;
-    } else if (['priority', 'status'].includes(field)) {
+    } else if (['priority', 'status', 'list'].includes(field)) {
       updateData[field] = value;
     } else {
       return res.status(400).json({ error: 'Invalid field' });
