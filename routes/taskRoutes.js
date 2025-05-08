@@ -19,5 +19,10 @@ router.patch(
   taskController.updateTaskField
 );
 router.post('/delete/:id', ensureAuthenticated, taskController.deleteTask);
+router.patch(
+  '/update-title/:id',
+  ensureAuthenticated,
+  taskController.updateTaskTitle
+);
 
 module.exports = router;

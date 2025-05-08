@@ -45,6 +45,7 @@ exports.addTask = async (req, res) => {
 exports.updateTask = async (req, res) => {
   const { id } = req.params;
   const {
+    title,
     description,
     priority,
     dueDate,
@@ -57,6 +58,7 @@ exports.updateTask = async (req, res) => {
   } = req.body;
   try {
     const updateData = {};
+    if (title) updateData.title = title;
     if (description) updateData.description = description;
     if (priority) updateData.priority = priority;
     if (dueDate) updateData.dueDate = dueDate ? new Date(dueDate) : null;
@@ -145,5 +147,24 @@ exports.deleteTask = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).send('Server error');
+  }
+};
+
+exports.updateTaskTitle = async (req, res) => {
+  const { id } = req.params;
+  const { title } = req.body;
+  try {
+    const task = await Task.findOneAndUpdate(
+      { _id: id, user: req.user._id },
+      { $set: { title } },
+      { new: true, runValidators: true }
+    );
+    if (!task) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
   }
 };

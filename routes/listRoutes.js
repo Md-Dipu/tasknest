@@ -23,5 +23,6 @@ router.post(
   ensureAuthenticated,
   listController.unsetDefaultList
 );
+router.patch('/update/:id', ensureAuthenticated, listController.updateList);
 
 module.exports = router;

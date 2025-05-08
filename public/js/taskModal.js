@@ -27,6 +27,7 @@ function openTaskModal(
   // Populate fields
   document.getElementById('modalTitle').textContent = title;
   document.getElementById('taskId').value = id;
+  document.getElementById('title').value = title;
   document.getElementById('description').value = description;
   document.getElementById('priority').value = priority;
   document.getElementById('dueDate').value = dueDate;

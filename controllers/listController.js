@@ -76,3 +76,22 @@ exports.unsetDefaultList = async (req, res) => {
     res.status(500).send('Server error');
   }
 };
+
+exports.updateList = async (req, res) => {
+  const { id } = req.params;
+  const { name } = req.body;
+  try {
+    const list = await List.findOneAndUpdate(
+      { _id: id, user: req.user._id },
+      { $set: { name } },
+      { new: true, runValidators: true }
+    );
+    if (!list) {
+      return res.status(404).json({ error: 'List not found' });
+    }
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
