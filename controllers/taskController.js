@@ -1,11 +1,45 @@
 const Task = require('../models/Task');
 const List = require('../models/List');
 
+const themes = {
+  student: {
+    primary: 'bg-indigo-600',
+    primaryHover: 'bg-indigo-700',
+    accent: 'text-indigo-600',
+    accentHover: 'text-indigo-800',
+    focusRing: 'focus:ring-indigo-500',
+    tabHover: 'border-indigo-500',
+  },
+  professional: {
+    primary: 'bg-teal-600',
+    primaryHover: 'bg-teal-700',
+    accent: 'text-teal-600',
+    accentHover: 'text-teal-800',
+    focusRing: 'focus:ring-teal-500',
+    tabHover: 'border-teal-500',
+  },
+  religious: {
+    primary: 'bg-purple-600',
+    primaryHover: 'bg-purple-700',
+    accent: 'text-purple-600',
+    accentHover: 'text-purple-800',
+    focusRing: 'focus:ring-purple-500',
+    tabHover: 'border-purple-500',
+  },
+};
+
 exports.getTasks = async (req, res) => {
   try {
     const tasks = await Task.find({ user: req.user._id });
     const lists = await List.find({ user: req.user._id });
-    res.render('dashboard/student', { user: req.user, tasks, lists });
+    const userType = req.user.userType || 'student';
+    res.render(`dashboard/${userType}`, {
+      user: req.user,
+      tasks,
+      lists,
+      userType,
+      theme: themes[userType],
+    });
   } catch (err) {
     console.error(err);
     res.status(500).send('Server error');

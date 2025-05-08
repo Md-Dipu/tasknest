@@ -98,15 +98,31 @@ function addSubtask(
   const subtaskDiv = document.createElement('div');
   subtaskDiv.className =
     'flex flex-col space-y-2 p-3 bg-white rounded-lg border border-gray-200';
+  // Use userType from global scope or DOM to determine theme
+  const userType =
+    document
+      .querySelector('h1')
+      .textContent.match(/\((\w+)\)/)?.[1]
+      .toLowerCase() || 'student';
+  const themes = {
+    student: 'text-indigo-600 focus:ring-indigo-500',
+    professional: 'text-teal-600 focus:ring-teal-500',
+    religious: 'text-purple-600 focus:ring-purple-500',
+  };
+  const themeClass = themes[userType];
   subtaskDiv.innerHTML = `
     <div class="flex items-center space-x-3">
       <input type="checkbox" name="subtasks[status][]" value="done" ${
         status === 'done' ? 'checked' : ''
-      } class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
-      <input type="text" name="subtasks[title][]" value="${title}" placeholder="Subtask Title" required class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+      } class="h-4 w-4 ${themeClass} border-gray-300 rounded">
+      <input type="text" name="subtasks[title][]" value="${title}" placeholder="Subtask Title" required class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 ${
+    themeClass.split(' ')[1]
+  } bg-white">
       <button type="button" onclick="this.parentElement.parentElement.remove()" class="text-red-600 hover:text-red-800 text-sm font-medium">Remove</button>
     </div>
-    <textarea name="subtasks[description][]" placeholder="Subtask Description" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white resize-none">${description}</textarea>
+    <textarea name="subtasks[description][]" placeholder="Subtask Description" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 ${
+      themeClass.split(' ')[1]
+    } bg-white resize-none">${description}</textarea>
   `;
   subtasksContainer.appendChild(subtaskDiv);
 }
@@ -117,16 +133,29 @@ function showTab(tabName) {
   const commentsButton = document.querySelector('.comments-tab');
   const worklogButton = document.querySelector('.worklog-tab');
 
+  // Determine theme based on userType
+  const userType =
+    document
+      .querySelector('h1')
+      .textContent.match(/\((\w+)\)/)?.[1]
+      .toLowerCase() || 'student';
+  const tabThemes = {
+    student: 'border-indigo-500',
+    professional: 'border-teal-500',
+    religious: 'border-purple-500',
+  };
+  const tabTheme = tabThemes[userType];
+
   if (tabName === 'comments') {
     commentsTab.classList.remove('hidden');
     worklogTab.classList.add('hidden');
-    commentsButton.classList.add('border-indigo-500');
-    worklogButton.classList.remove('border-indigo-500');
+    commentsButton.classList.add(tabTheme);
+    worklogButton.classList.remove(tabTheme);
   } else {
     commentsTab.classList.add('hidden');
     worklogTab.classList.remove('hidden');
-    commentsButton.classList.remove('border-indigo-500');
-    worklogButton.classList.add('border-indigo-500');
+    commentsButton.classList.remove(tabTheme);
+    worklogButton.classList.add(tabTheme);
   }
 }
 

@@ -8,9 +8,9 @@ exports.getDashboard = async (req, res) => {
     if (req.user.userType === 'student') {
       res.render('dashboard/student', { user: req.user, lists, tasks });
     } else if (req.user.userType === 'professional') {
-      res.render('dashboard/professional', { user: req.user, tasks });
+      res.render('dashboard/professional', { user: req.user, lists, tasks });
     } else if (req.user.userType === 'religious') {
-      res.render('dashboard/religious', { user: req.user, tasks });
+      res.render('dashboard/religious', { user: req.user, lists, tasks });
     } else {
       res.redirect('/');
     }
