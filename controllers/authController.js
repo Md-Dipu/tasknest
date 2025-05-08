@@ -33,7 +33,7 @@ const defaultConfig = {
 };
 
 exports.getRegister = (req, res) => {
-  res.render('auth/register', { error: null });
+  res.render('auth/register', { error: null, user: req.user });
 };
 
 exports.register = async (req, res) => {
@@ -41,7 +41,10 @@ exports.register = async (req, res) => {
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.render('auth/register', { error: 'Email already in use' });
+      return res.render('auth/register', {
+        error: 'Email already in use',
+        user: req.user,
+      });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -83,12 +86,15 @@ exports.register = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.render('auth/register', { error: 'Registration failed' });
+    res.render('auth/register', {
+      error: 'Registration failed',
+      user: req.user,
+    });
   }
 };
 
 exports.getLogin = (req, res) => {
-  res.render('auth/login', { error: null });
+  res.render('auth/login', { error: null, user: req.user });
 };
 
 exports.login = passport.authenticate('local', {

@@ -1,15 +1,117 @@
-<header class="bg-indigo-600 text-white shadow-md">
-  <nav class="container mx-auto px-4 py-4 flex justify-between items-center">
-    <a href="/" class="text-2xl font-bold">tasknest</a>
-    <div class="space-x-4">
-      <a href="/" class="hover:text-gray-200">Home</a>
+<header class="bg-white shadow-md">
+  <nav class="container mx-auto px-4 py-4 flex items-center justify-between">
+    <!-- Logo -->
+    <a
+      href="/"
+      class="text-2xl font-bold text-gray-800"
+      aria-label="tasknest Home"
+    >
+      tasknest <% if (user && user.userType) { %>
+      <span
+        class="text-sm <%= user.userType === 'student' ? 'text-indigo-600' : user.userType === 'professional' ? 'text-teal-600' : 'text-purple-600' %>"
+      >
+        (<%= user.userType.charAt(0).toUpperCase() + user.userType.slice(1) %>)
+      </span>
+      <% } %>
+    </a>
+
+    <!-- Desktop Navigation -->
+    <div class="hidden md:flex items-center space-x-6">
+      <a
+        href="/"
+        class="text-gray-600 hover:text-gray-800 font-medium"
+        aria-label="Home"
+        >Home</a
+      >
       <% if (user) { %>
-      <a href="/dashboard" class="hover:text-gray-200">Dashboard</a>
-      <a href="/auth/logout" class="hover:text-gray-200">Logout</a>
+      <a
+        href="/dashboard"
+        class="text-gray-600 hover:text-gray-800 font-medium"
+        aria-label="Dashboard"
+        >Dashboard</a
+      >
+      <a
+        href="/auth/logout"
+        class="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors"
+        aria-label="Log Out"
+        >Log Out</a
+      >
       <% } else { %>
-      <a href="/auth/login" class="hover:text-gray-200">Login</a>
-      <a href="/auth/register" class="hover:text-gray-200">Register</a>
+      <a
+        href="/auth/register"
+        class="text-gray-600 hover:text-gray-800 font-medium"
+        aria-label="Register"
+        >Register</a
+      >
+      <a
+        href="/auth/login"
+        class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
+        aria-label="Log In"
+        >Log In</a
+      >
       <% } %>
     </div>
+
+    <!-- Mobile Hamburger Menu -->
+    <button
+      id="menu-toggle"
+      class="md:hidden text-gray-600 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500"
+      aria-label="Toggle navigation menu"
+      aria-expanded="false"
+    >
+      <svg
+        class="w-6 h-6"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M4 6h16M4 12h16M4 18h16"
+        ></path>
+      </svg>
+    </button>
   </nav>
+
+  <!-- Mobile Menu (Hidden by Default) -->
+  <div id="mobile-menu" class="hidden md:hidden bg-white shadow-md">
+    <div class="container mx-auto px-4 py-4 flex flex-col space-y-4">
+      <a
+        href="/"
+        class="text-gray-600 hover:text-gray-800 font-medium"
+        aria-label="Home"
+        >Home</a
+      >
+      <% if (user) { %>
+      <a
+        href="/dashboard"
+        class="text-gray-600 hover:text-gray-800 font-medium"
+        aria-label="Dashboard"
+        >Dashboard</a
+      >
+      <a
+        href="/auth/logout"
+        class="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors"
+        aria-label="Log Out"
+        >Log Out</a
+      >
+      <% } else { %>
+      <a
+        href="/auth/register"
+        class="text-gray-600 hover:text-gray-800 font-medium"
+        aria-label="Register"
+        >Register</a
+      >
+      <a
+        href="/auth/login"
+        class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
+        aria-label="Log In"
+        >Log In</a
+      >
+      <% } %>
+    </div>
+  </div>
 </header>

@@ -70,8 +70,10 @@ passport.deserializeUser(async (id, done) => {
   }
 });
 
-// Routes
+// Home route
 app.get('/', (req, res) => res.render('index', { user: req.user }));
+
+// Routes
 app.use('/auth', authRoutes);
 app.use('/dashboard', dashboardRoutes);
 app.use('/lists', listRoutes);
