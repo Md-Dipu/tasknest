@@ -8,11 +8,11 @@ const passport = require('passport');
 const defaultConfig = {
   student: {
     lists: [
-      { name: 'To Do', isDefault: true },
-      { name: 'In Progress', isDefault: false },
-      { name: 'Done', isDefault: false },
+      { name: 'Assignments', isDefault: true },
+      { name: 'Exams & Tests', isDefault: false },
+      { name: 'Clubs & Activities', isDefault: false },
     ],
-    defaultTask: { title: 'Start a new assignment', listIndex: 0 },
+    defaultTask: { title: 'Start your first assignment', listIndex: 0 },
   },
   professional: {
     lists: [
