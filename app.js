@@ -1,3 +1,4 @@
+const colors = require('colors');
 const express = require('express');
 const session = require('express-session');
 const passport = require('passport');
@@ -81,4 +82,6 @@ app.use('/tasks', taskRoutes);
 
 // Start server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(colors.yellow.bold(`Server running on port ${PORT}`));
+});
