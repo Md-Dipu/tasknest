@@ -14,9 +14,6 @@ const User = require('./models/User');
 
 const app = express();
 
-// Connect to database
-connectDB();
-
 // Middleware
 app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
@@ -80,8 +77,36 @@ app.use('/dashboard', dashboardRoutes);
 app.use('/lists', listRoutes);
 app.use('/tasks', taskRoutes);
 
-// Start server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(colors.yellow.bold(`Server running on port ${PORT}`));
+/**
+ * Connect to the database and start the server
+ */
+async function startServer() {
+  try {
+    await connectDB();
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+      console.log(colors.yellow.bold(`[INFO] Server running on port ${PORT}`));
+    });
+  } catch (err) {
+    console.error(colors.red.bold('Failed to connect to the database:', err));
+  }
+}
+
+startServer();
+
+/**
+ * Handle 404 errors
+ */
+app.use((req, res) => {
+  res.status(404).render('404', { user: req.user });
 });
+
+/**
+ * Handle 500 errors
+ */
+app.use((err, req, res, next) => {
+  console.error(colors.red.bold('Server Error:', err));
+  res.status(500).render('500', { user: req.user, error: err.message });
+});
+
+module.exports = app;

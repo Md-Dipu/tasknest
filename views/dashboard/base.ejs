@@ -117,17 +117,19 @@
               const shareButton = document.querySelector(
                 `#share-button-<%= list._id %>`
               );
-              shareButton.addEventListener('click', (e) => {
-                e.preventDefault();
-                const form = document.getElementById(
-                  `share-form-<%= list._id %>`
-                );
-                if (form.classList.contains('hidden')) {
-                  form.classList.remove('hidden');
-                } else {
-                  form.classList.add('hidden');
-                }
-              });
+              if (shareButton) {
+                shareButton.addEventListener('click', (e) => {
+                  e.preventDefault();
+                  const form = document.getElementById(
+                    `share-form-<%= list._id %>`
+                  );
+                  if (form.classList.contains('hidden')) {
+                    form.classList.remove('hidden');
+                  } else {
+                    form.classList.add('hidden');
+                  }
+                });
+              }
             });
           </script>
           <!-- Task Cards -->
