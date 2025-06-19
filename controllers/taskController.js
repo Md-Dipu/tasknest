@@ -1,44 +1,24 @@
 const Task = require('../models/Task');
 const List = require('../models/List');
 
-const themes = {
-  student: {
-    primary: 'bg-indigo-600',
-    primaryHover: 'bg-indigo-700',
-    accent: 'text-indigo-600',
-    accentHover: 'text-indigo-800',
-    focusRing: 'focus:ring-indigo-500',
-    tabHover: 'border-indigo-500',
-  },
-  professional: {
-    primary: 'bg-teal-600',
-    primaryHover: 'bg-teal-700',
-    accent: 'text-teal-600',
-    accentHover: 'text-teal-800',
-    focusRing: 'focus:ring-teal-500',
-    tabHover: 'border-teal-500',
-  },
-  religious: {
-    primary: 'bg-purple-600',
-    primaryHover: 'bg-purple-700',
-    accent: 'text-purple-600',
-    accentHover: 'text-purple-800',
-    focusRing: 'focus:ring-purple-500',
-    tabHover: 'border-purple-500',
-  },
-};
-
 exports.getTasks = async (req, res) => {
   try {
-    const tasks = await Task.find({ user: req.user._id });
-    const lists = await List.find({ user: req.user._id });
+    // Fetch lists owned by or shared with the user
+    const lists = await List.find({
+      $or: [{ user: req.user._id }, { sharedWith: req.user._id }],
+    });
+
+    // Fetch tasks belonging to these lists
+    const tasks = await Task.find({
+      list: { $in: lists.map((list) => list._id) },
+    });
+
     const userType = req.user.userType || 'student';
     res.render(`dashboard/${userType}`, {
       user: req.user,
       tasks,
       lists,
       userType,
-      theme: themes[userType],
     });
   } catch (err) {
     console.error(err);
@@ -47,24 +27,23 @@ exports.getTasks = async (req, res) => {
 };
 
 exports.addTask = async (req, res) => {
-  const { title, listId } = req.body;
+  const { title, listId, description, priority, dueDate } = req.body;
   try {
-    let list = listId
-      ? await List.findOne({ _id: listId, user: req.user._id })
-      : null;
+    // Ensure the list exists and is accessible by the user
+    const list = await List.findOne({
+      _id: listId,
+      $or: [{ user: req.user._id }, { sharedWith: req.user._id }],
+    });
+
     if (!list) {
-      list = await List.findOne({ user: req.user._id, isDefault: true });
-      if (!list) {
-        list = new List({
-          name: 'Default',
-          isDefault: true,
-          user: req.user._id,
-        });
-        await list.save();
-      }
+      return res.status(404).send('List not found or access denied');
     }
+
     const task = new Task({
       title,
+      description,
+      priority,
+      dueDate: dueDate ? new Date(dueDate) : null,
       list: list._id,
       user: req.user._id,
     });
@@ -97,7 +76,18 @@ exports.updateTask = async (req, res) => {
     if (priority) updateData.priority = priority;
     if (dueDate) updateData.dueDate = dueDate ? new Date(dueDate) : null;
     if (status) updateData.status = status;
-    if (listId) updateData.list = listId;
+
+    // Ensure the new list exists and is accessible by the user
+    if (listId) {
+      const list = await List.findOne({
+        _id: listId,
+        $or: [{ user: req.user._id }, { sharedWith: req.user._id }],
+      });
+      if (!list) {
+        return res.status(404).send('List not found or access denied');
+      }
+      updateData.list = list._id;
+    }
 
     // Handle subtasks
     if (subtasks) {
@@ -143,6 +133,31 @@ exports.updateTask = async (req, res) => {
   }
 };
 
+exports.deleteTask = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const task = await Task.findOne({ _id: id, user: req.user._id });
+    if (!task) {
+      return res.status(404).send('Task not found');
+    }
+
+    // Ensure the list is accessible by the user
+    const list = await List.findOne({
+      _id: task.list,
+      $or: [{ user: req.user._id }, { sharedWith: req.user._id }],
+    });
+    if (!list) {
+      return res.status(403).send('Access denied');
+    }
+
+    await Task.findOneAndDelete({ _id: id, user: req.user._id });
+    res.redirect('/dashboard');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server error');
+  }
+};
+
 exports.updateTaskField = async (req, res) => {
   const { id } = req.params;
   const { field, value } = req.body;
@@ -170,17 +185,6 @@ exports.updateTaskField = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error' });
-  }
-};
-
-exports.deleteTask = async (req, res) => {
-  const { id } = req.params;
-  try {
-    await Task.findOneAndDelete({ _id: id, user: req.user._id });
-    res.redirect('/dashboard');
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Server error');
   }
 };
 

@@ -20,25 +20,37 @@ exports.addList = async (req, res) => {
 exports.deleteList = async (req, res) => {
   const { id } = req.params;
   try {
-    const list = await List.findOne({ _id: id, user: req.user._id });
+    // Ensure the list exists and is owned by the user
+    const list = await List.findOne({
+      _id: id,
+      $or: [{ user: req.user._id }, { sharedWith: req.user._id }],
+    });
     if (!list) {
       return res.status(404).send('List not found');
     }
     if (list.isDefault) {
       return res.status(400).send('Cannot delete default list');
     }
-    const defaultList = await List.findOne({
-      user: req.user._id,
-      isDefault: true,
-    });
-    if (!defaultList) {
-      return res.status(400).send('No default list found');
+
+    // If the user is the owner, reassign tasks to the default list
+    if (list.user.toString() === req.user._id.toString()) {
+      const defaultList = await List.findOne({
+        user: req.user._id,
+        isDefault: true,
+      });
+      if (!defaultList) {
+        return res.status(400).send('No default list found');
+      }
+      await Task.updateMany({ list: id }, { $set: { list: defaultList._id } });
+      await List.findOneAndDelete({ _id: id });
+    } else {
+      // If the user is not the owner, just remove them from the sharedWith array
+      list.sharedWith = list.sharedWith.filter(
+        (userId) => userId.toString() !== req.user._id.toString()
+      );
+      await list.save();
     }
-    await Task.updateMany(
-      { list: id, user: req.user._id },
-      { $set: { list: defaultList._id } }
-    );
-    await List.findOneAndDelete({ _id: id, user: req.user._id });
+
     res.redirect('/dashboard');
   } catch (err) {
     console.error(err);
@@ -49,15 +61,21 @@ exports.deleteList = async (req, res) => {
 exports.setDefaultList = async (req, res) => {
   const { id } = req.params;
   try {
+    // Ensure the list exists and is owned by the user
+    const list = await List.findOne({
+      _id: id,
+      user: req.user._id,
+    });
+    if (!list) {
+      return res.status(404).send('List not found');
+    }
+
     await List.updateMany(
       { user: req.user._id, isDefault: true },
       { $set: { isDefault: false } }
     );
-    await List.findOneAndUpdate(
-      { _id: id, user: req.user._id },
-      { $set: { isDefault: true } },
-      { runValidators: true }
-    );
+    list.isDefault = true;
+    await list.save();
     res.redirect('/dashboard');
   } catch (err) {
     console.error(err);
@@ -82,14 +100,22 @@ exports.updateList = async (req, res) => {
   const { id } = req.params;
   const { name } = req.body;
   try {
-    const list = await List.findOneAndUpdate(
-      { _id: id, user: req.user._id },
-      { $set: { name } },
-      { new: true, runValidators: true }
-    );
+    // Ensure the list exists and is accessible by the user
+    const list = await List.findOne({
+      _id: id,
+      $or: [{ user: req.user._id }, { sharedWith: req.user._id }],
+    });
     if (!list) {
       return res.status(404).json({ error: 'List not found' });
     }
+
+    // Only the owner can update the list name
+    if (list.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
+    list.name = name;
+    await list.save();
     res.json({ success: true });
   } catch (err) {
     console.error(err);
@@ -111,7 +137,7 @@ exports.shareList = async (req, res) => {
     // Find the list and ensure the current user has access to it
     const list = await List.findOne({
       _id: id,
-      $or: [{ user: req.user._id }, { sharedWith: req.user._id }],
+      user: req.user._id,
     });
     if (!list) {
       return res.status(404).send('List not found');
