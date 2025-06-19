@@ -42,6 +42,15 @@
             />
             <div class="flex space-x-2">
               <% if (!list.isDefault) { %>
+              <div>
+                <button
+                  id="share-button-<%= list._id %>"
+                  class="<%= theme.accent %> hover:<%= theme.accentHover %> text-sm"
+                  title="Share List"
+                >
+                  <i class="fa-regular fa-share-from-square"></i>
+                </button>
+              </div>
               <form action="/lists/set-default/<%= list._id %>" method="POST">
                 <button
                   type="submit"
@@ -73,6 +82,55 @@
               <% } %>
             </div>
           </div>
+          <div id="share-form-<%= list._id %>" class="hidden">
+            <!-- Share with other users -->
+            <form
+              id="share-form-<%= list._id %>"
+              action="/lists/share/<%= list._id %>"
+              method="POST"
+              class="mb-3"
+            >
+              <input
+                type="email"
+                name="email"
+                placeholder="Share with user email"
+                required
+                class="w-full px-2 py-1 border rounded-md text-sm mb-2"
+              />
+              <button
+                type="submit"
+                class="w-full <%= theme.primary %> text-white px-2 py-1 rounded-md hover:<%= theme.primaryHover %> text-sm"
+              >
+                Share
+              </button>
+              <button
+                type="button"
+                onclick="document.getElementById('share-form-<%= list._id %>').classList.add('hidden')"
+                class="w-full bg-gray-200 text-gray-800 px-2 py-1 rounded-md hover:bg-gray-300 text-sm mt-2"
+              >
+                Cancel
+              </button>
+            </form>
+          </div>
+          <script>
+            document.addEventListener('DOMContentLoaded', () => {
+              const shareButton = document.querySelector(
+                `#share-button-<%= list._id %>`
+              );
+              shareButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                const form = document.getElementById(
+                  `share-form-<%= list._id %>`
+                );
+                if (form.classList.contains('hidden')) {
+                  form.classList.remove('hidden');
+                } else {
+                  form.classList.add('hidden');
+                }
+              });
+            });
+          </script>
+          <!-- Task Cards -->
           <div class="space-y-3 task-list" data-list-id="<%= list._id %>">
             <% tasks.filter(task => task.list.toString() ===
             list._id.toString()).forEach(task => { %>

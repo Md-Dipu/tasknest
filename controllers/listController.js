@@ -1,5 +1,6 @@
 const List = require('../models/List');
 const Task = require('../models/Task');
+const User = require('../models/User');
 
 exports.addList = async (req, res) => {
   const { name } = req.body;
@@ -93,5 +94,41 @@ exports.updateList = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error' });
+  }
+};
+
+exports.shareList = async (req, res) => {
+  const { id } = req.params;
+  const { email } = req.body;
+
+  try {
+    // Find the user by email
+    const userToShareWith = await User.findOne({ email });
+    if (!userToShareWith) {
+      return res.status(404).send('User with the provided email not found');
+    }
+
+    // Find the list and ensure the current user has access to it
+    const list = await List.findOne({
+      _id: id,
+      $or: [{ user: req.user._id }, { sharedWith: req.user._id }],
+    });
+    if (!list) {
+      return res.status(404).send('List not found');
+    }
+
+    // Check if the user is already in the sharedWith array
+    if (list.sharedWith.includes(userToShareWith._id)) {
+      return res.status(400).send('List is already shared with this user');
+    }
+
+    // Add the user to the sharedWith array
+    list.sharedWith.push(userToShareWith._id);
+    await list.save();
+
+    res.redirect('/dashboard');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server error');
   }
 };

@@ -24,5 +24,6 @@ router.post(
   listController.unsetDefaultList
 );
 router.patch('/update/:id', ensureAuthenticated, listController.updateList);
+router.post('/share/:id', ensureAuthenticated, listController.shareList);
 
 module.exports = router;
