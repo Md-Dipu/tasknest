@@ -1,14 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const taskController = require('../controllers/taskController');
-
-// Middleware to ensure user is authenticated
-const ensureAuthenticated = (req, res, next) => {
-  if (req.isAuthenticated()) {
-    return next();
-  }
-  res.redirect('/auth/login');
-};
+const { ensureAuthenticated } = require('../middleware/auth');
 
 // Task routes
 router.post('/add', ensureAuthenticated, taskController.addTask);
