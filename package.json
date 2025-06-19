@@ -1,6 +1,6 @@
 {
   "name": "tasknest",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
