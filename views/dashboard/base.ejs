@@ -9,7 +9,7 @@
     </title>
     <link rel="stylesheet" href="/css/style.css" />
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <script src="https://cdn.jsdelivr.net/npm/draggable@4.2.0/lib/draggable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.8/lib/draggable.bundle.js"></script>
     <script
       src="https://kit.fontawesome.com/97f768214c.js"
       crossorigin="anonymous"
@@ -494,27 +494,36 @@
     <script>
       document.addEventListener('DOMContentLoaded', () => {
         const taskLists = document.querySelectorAll('.task-list');
-        taskLists.forEach((list) => {
-          new Draggable(list, {
-            draggable: '.task-card',
-            dropzone: '.task-list',
-            onDrop: async (event) => {
-              const taskId = event.element.dataset.taskId;
-              const newListId = event.dropzone.dataset.listId;
-              try {
-                const response = await fetch(`/tasks/update/${taskId}/field`, {
-                  method: 'PATCH',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ field: 'list', value: newListId }),
-                });
-                if (!response.ok) {
-                  console.error('Failed to move task');
-                }
-              } catch (err) {
-                console.error('Error moving task:', err);
-              }
-            },
-          });
+
+        // Initialize Draggable
+        const draggable = new Draggable.Sortable(taskLists, {
+          draggable: '.task-card',
+          mirror: {
+            constrainDimensions: true,
+          },
+        });
+
+        // Handle drag stop event
+        draggable.on('sortable:stop', async (event) => {
+          const taskId = event.dragEvent.source.dataset.taskId;
+          const newListId = event.newContainer.dataset.listId;
+
+          try {
+            // Update the task's list in the backend
+            const response = await fetch(`/tasks/update/${taskId}/field`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ field: 'list', value: newListId }),
+            });
+
+            if (!response.ok) {
+              console.error('Failed to move task');
+              alert('Failed to move task. Please try again.');
+            }
+          } catch (err) {
+            console.error('Error moving task:', err);
+            alert('An error occurred while moving the task.');
+          }
         });
       });
 
