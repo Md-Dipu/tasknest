@@ -137,9 +137,16 @@
             <% tasks.filter(task => task.list.toString() ===
             list._id.toString()).forEach(task => { %>
             <div
-              class="bg-white p-3 rounded-lg shadow-sm task-card"
+              class="relative bg-white p-3 rounded-lg shadow-sm task-card"
               data-task-id="<%= task._id %>"
             >
+              <button
+                class="drag-handle text-gray-500 hover:text-gray-700 cursor-grab absolute top-2 right-2"
+                title="Drag Task"
+                style="z-index: 10"
+              >
+                <i class="fa-solid fa-grip-vertical"></i>
+              </button>
               <h4
                 class="text-md font-medium text-gray-800 cursor-pointer"
                 onclick="editTaskTitle('<%= task._id %>', this)"
@@ -495,9 +502,10 @@
       document.addEventListener('DOMContentLoaded', () => {
         const taskLists = document.querySelectorAll('.task-list');
 
-        // Initialize Draggable
+        // Initialize Draggable with drag handle
         const draggable = new Draggable.Sortable(taskLists, {
           draggable: '.task-card',
+          handle: '.drag-handle',
           mirror: {
             constrainDimensions: true,
           },
