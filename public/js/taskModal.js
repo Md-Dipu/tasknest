@@ -174,11 +174,21 @@ async function updateTaskField(element, field) {
 
     const result = await response.json();
     if (!result.success) {
-      console.error('Update failed:', result.error);
-      alert('Failed to update task field');
+      Toastify({
+        text: `Failed to update task field: ${result.error}`,
+        duration: 3000,
+        gravity: 'top',
+        position: 'right',
+        backgroundColor: '#f56565', // Red
+      }).showToast();
     }
   } catch (err) {
-    console.error('Error updating task field:', err);
-    alert('Error updating task field');
+    Toastify({
+      text: 'Error updating task field. Please try again.',
+      duration: 3000,
+      gravity: 'top',
+      position: 'right',
+      backgroundColor: '#f56565', // Red
+    }).showToast();
   }
 }

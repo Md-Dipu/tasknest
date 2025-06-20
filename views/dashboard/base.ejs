@@ -8,12 +8,17 @@
       tasknest
     </title>
     <link rel="stylesheet" href="/css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
+    />
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.8/lib/draggable.bundle.js"></script>
     <script
       src="https://kit.fontawesome.com/97f768214c.js"
       crossorigin="anonymous"
     ></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
   </head>
   <body class="bg-gray-50 min-h-screen">
     <%- include('../partials/header') %>
@@ -525,12 +530,22 @@
             });
 
             if (!response.ok) {
-              console.error('Failed to move task');
-              alert('Failed to move task. Please try again.');
+              Toastify({
+                text: 'Failed to move task. Please try again.',
+                duration: 3000,
+                gravity: 'top',
+                position: 'right',
+                backgroundColor: '#f56565', // Red
+              }).showToast();
             }
           } catch (err) {
-            console.error('Error moving task:', err);
-            alert('An error occurred while moving the task.');
+            Toastify({
+              text: 'An error occurred while moving the task.',
+              duration: 3000,
+              gravity: 'top',
+              position: 'right',
+              backgroundColor: '#f56565', // Red
+            }).showToast();
           }
         });
       });
@@ -580,12 +595,22 @@
               h3.classList.remove('hidden');
               input.classList.add('hidden');
             } else {
-              console.error('Failed to update list title');
-              alert('Failed to update list title');
+              Toastify({
+                text: 'Failed to update list title.',
+                duration: 3000,
+                gravity: 'top',
+                position: 'right',
+                backgroundColor: '#f56565', // Red
+              }).showToast();
             }
           } catch (err) {
-            console.error('Error updating list title:', err);
-            alert('Error updating list title');
+            Toastify({
+              text: 'Error updating list title.',
+              duration: 3000,
+              gravity: 'top',
+              position: 'right',
+              backgroundColor: '#f56565', // Red
+            }).showToast();
           }
         }
       }
@@ -613,12 +638,22 @@
               h4.classList.remove('hidden');
               input.classList.add('hidden');
             } else {
-              console.error('Failed to update task title');
-              alert('Failed to update task title');
+              Toastify({
+                text: 'Failed to update task title.',
+                duration: 3000,
+                gravity: 'top',
+                position: 'right',
+                backgroundColor: '#f56565', // Red
+              }).showToast();
             }
           } catch (err) {
-            console.error('Error updating task title:', err);
-            alert('Error updating task title');
+            Toastify({
+              text: 'Error updating task title.',
+              duration: 3000,
+              gravity: 'top',
+              position: 'right',
+              backgroundColor: '#f56565', // Red
+            }).showToast();
           }
         }
       }
