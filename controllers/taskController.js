@@ -1,6 +1,7 @@
 const Task = require('../models/Task');
 const List = require('../models/List');
 
+// Fetch tasks for the dashboard
 exports.getTasks = async (req, res) => {
   try {
     // Fetch lists owned by or shared with the user
@@ -26,6 +27,7 @@ exports.getTasks = async (req, res) => {
   }
 };
 
+// Add a new task
 exports.addTask = async (req, res) => {
   const { title, listId, description, priority, dueDate } = req.body;
   try {
@@ -55,6 +57,7 @@ exports.addTask = async (req, res) => {
   }
 };
 
+// Update a task
 exports.updateTask = async (req, res) => {
   const { id } = req.params;
   const {
@@ -69,7 +72,29 @@ exports.updateTask = async (req, res) => {
     worklog,
     worklogDescription,
   } = req.body;
+
   try {
+    // Find the task and populate list.user and list.sharedWith
+    const task = await Task.findOne({ _id: id }).populate({
+      path: 'list',
+      select: 'user sharedWith',
+    });
+
+    if (!task) {
+      return res.status(404).send('Task not found');
+    }
+
+    // Check access
+    const isTaskOwner = task.user.toString() === req.user._id.toString();
+    const isListOwner = task.list.user.toString() === req.user._id.toString();
+    const isSharedWithUser = task.list.sharedWith.some(
+      (sharedUserId) => sharedUserId.toString() === req.user._id.toString()
+    );
+
+    if (!isTaskOwner && !isListOwner && !isSharedWithUser) {
+      return res.status(403).send('Access denied');
+    }
+
     const updateData = {};
     if (title) updateData.title = title;
     if (description) updateData.description = description;
@@ -119,7 +144,7 @@ exports.updateTask = async (req, res) => {
     }
 
     await Task.findOneAndUpdate(
-      { _id: id, user: req.user._id },
+      { _id: id },
       {
         $set: updateData,
         $push: pushData,
@@ -133,24 +158,31 @@ exports.updateTask = async (req, res) => {
   }
 };
 
+// Delete a task
 exports.deleteTask = async (req, res) => {
   const { id } = req.params;
   try {
-    const task = await Task.findOne({ _id: id, user: req.user._id });
+    const task = await Task.findOne({ _id: id }).populate({
+      path: 'list',
+      select: 'user sharedWith',
+    });
+
     if (!task) {
       return res.status(404).send('Task not found');
     }
 
-    // Ensure the list is accessible by the user
-    const list = await List.findOne({
-      _id: task.list,
-      $or: [{ user: req.user._id }, { sharedWith: req.user._id }],
-    });
-    if (!list) {
+    // Check access
+    const isTaskOwner = task.user.toString() === req.user._id.toString();
+    const isListOwner = task.list.user.toString() === req.user._id.toString();
+    const isSharedWithUser = task.list.sharedWith.some(
+      (sharedUserId) => sharedUserId.toString() === req.user._id.toString()
+    );
+
+    if (!isTaskOwner && !isListOwner && !isSharedWithUser) {
       return res.status(403).send('Access denied');
     }
 
-    await Task.findOneAndDelete({ _id: id, user: req.user._id });
+    await Task.findOneAndDelete({ _id: id });
     res.redirect('/dashboard');
   } catch (err) {
     console.error(err);
@@ -158,10 +190,32 @@ exports.deleteTask = async (req, res) => {
   }
 };
 
+// Update a specific task field
 exports.updateTaskField = async (req, res) => {
   const { id } = req.params;
   const { field, value } = req.body;
+
   try {
+    const task = await Task.findOne({ _id: id }).populate({
+      path: 'list',
+      select: 'user sharedWith',
+    });
+
+    if (!task) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
+    // Check access
+    const isTaskOwner = task.user.toString() === req.user._id.toString();
+    const isListOwner = task.list.user.toString() === req.user._id.toString();
+    const isSharedWithUser = task.list.sharedWith.some(
+      (sharedUserId) => sharedUserId.toString() === req.user._id.toString()
+    );
+
+    if (!isTaskOwner && !isListOwner && !isSharedWithUser) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
     const updateData = {};
     if (field === 'dueDate') {
       updateData[field] = value ? new Date(value) : null;
@@ -171,15 +225,11 @@ exports.updateTaskField = async (req, res) => {
       return res.status(400).json({ error: 'Invalid field' });
     }
 
-    const task = await Task.findOneAndUpdate(
-      { _id: id, user: req.user._id },
+    await Task.findOneAndUpdate(
+      { _id: id },
       { $set: updateData },
       { new: true, runValidators: true }
     );
-
-    if (!task) {
-      return res.status(404).json({ error: 'Task not found' });
-    }
 
     res.json({ success: true });
   } catch (err) {
@@ -188,18 +238,35 @@ exports.updateTaskField = async (req, res) => {
   }
 };
 
+// Update task title
 exports.updateTaskTitle = async (req, res) => {
   const { id } = req.params;
   const { title } = req.body;
+
   try {
-    const task = await Task.findOneAndUpdate(
-      { _id: id, user: req.user._id },
-      { $set: { title } },
-      { new: true, runValidators: true }
-    );
+    const task = await Task.findOne({ _id: id }).populate({
+      path: 'list',
+      select: 'user sharedWith',
+    });
+
     if (!task) {
       return res.status(404).json({ error: 'Task not found' });
     }
+
+    // Check access
+    const isTaskOwner = task.user.toString() === req.user._id.toString();
+    const isListOwner = task.list.user.toString() === req.user._id.toString();
+    const isSharedWithUser = task.list.sharedWith.some(
+      (sharedUserId) => sharedUserId.toString() === req.user._id.toString()
+    );
+
+    if (!isTaskOwner && !isListOwner && !isSharedWithUser) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
+    task.title = title;
+    await task.save();
+
     res.json({ success: true });
   } catch (err) {
     console.error(err);
