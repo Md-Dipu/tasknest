@@ -107,7 +107,7 @@ exports.logout = (req, res) => {
   req.logout((err) => {
     if (err) {
       console.error(err);
-      return res.status(500).send('Server error');
+      throw new Error('Logout failed');
     }
     res.redirect('/');
   });
