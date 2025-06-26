@@ -103,28 +103,57 @@ To run tasknest locally, follow these steps:
 
 ## Contributing
 
-We welcome contributions to tasknest! To get started:
+We welcome and appreciate contributions to tasknest! Whether you're fixing bugs, adding features, improving documentation, or enhancing the user experience, your contributions help make this project better for everyone.
 
-1. **Fork the repository.**
-2. **Create a new branch:**
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-3. **Make your changes and commit:**
-   ```bash
-   git commit -m "Add your feature description"
-   ```
-4. **Push to your fork:**
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-5. **Open a pull request** to the main repository.
+### Quick Start for Contributors
 
-Please ensure your code follows our [contributing guidelines](CONTRIBUTING.md).
+1. **Fork the repository**
+2. **Create a feature branch:**
+   ```bash
+   git checkout -b feat/your-feature-name
+   ```
+3. **Make your changes and test thoroughly**
+4. **Follow our commit message conventions:**
+   ```bash
+   git commit -m "feat(component): add your feature description"
+   ```
+5. **Push to your fork:**
+   ```bash
+   git push origin feat/your-feature-name
+   ```
+6. **Open a pull request** with a clear description
+
+### Detailed Guidelines
+
+For comprehensive information about contributing, including:
+
+- Development setup
+- Coding standards
+- Testing requirements
+- Pull request process
+- Bug reporting guidelines
+
+Please read our **[Contributing Guidelines](CONTRIBUTING.md)**.
+
+### Types of Contributions Welcome
+
+- 🐛 Bug fixes and error handling improvements
+- ✨ New features and enhancements
+- 📚 Documentation improvements
+- 🎨 UI/UX enhancements
+- ⚡ Performance optimizations
+- 🧪 Test coverage improvements
+- ♿ Accessibility improvements
 
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
+
+## Contributors
+
+Thanks to all the contributors who have helped make tasknest better!
+
+<!-- Contributors will be automatically added here -->
 
 ## Contact
 
