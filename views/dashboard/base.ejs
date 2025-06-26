@@ -89,11 +89,7 @@
           </div>
           <div id="share-form-<%= list._id %>" class="hidden">
             <!-- Share with other users -->
-            <form
-              id="share-form-<%= list._id %>"
-              onsubmit="shareList(event)"
-              class="mb-3"
-            >
+            <form onsubmit="shareList(event)" class="mb-3">
               <input
                 type="email"
                 name="email"
@@ -165,7 +161,11 @@
                       backgroundColor: '#38a169', // Green
                     }).showToast();
                     form.reset();
-                    form.classList.add('hidden');
+
+                    // Hide the share form after successful share
+                    document
+                      .getElementById('share-form-<%= list._id %>')
+                      .classList.add('hidden');
                   } else {
                     throw new Error('Failed to share list');
                   }
