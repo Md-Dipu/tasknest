@@ -91,8 +91,7 @@
             <!-- Share with other users -->
             <form
               id="share-form-<%= list._id %>"
-              action="/lists/share/<%= list._id %>"
-              method="POST"
+              onsubmit="shareList(event)"
               class="mb-3"
             >
               <input
@@ -136,6 +135,51 @@
                 });
               }
             });
+
+            function shareList(event) {
+              event.preventDefault();
+              const form = event.target;
+              const email = form.email.value.trim();
+              if (!email) {
+                return Toastify({
+                  text: 'Please enter a valid email address.',
+                  duration: 3000,
+                  gravity: 'top',
+                  position: 'right',
+                  backgroundColor: '#f56565', // Red
+                }).showToast();
+              }
+
+              fetch(`/lists/share/<%= list._id %>`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email }),
+              })
+                .then((response) => {
+                  if (response.ok) {
+                    Toastify({
+                      text: 'List shared successfully!',
+                      duration: 3000,
+                      gravity: 'top',
+                      position: 'right',
+                      backgroundColor: '#38a169', // Green
+                    }).showToast();
+                    form.reset();
+                    form.classList.add('hidden');
+                  } else {
+                    throw new Error('Failed to share list');
+                  }
+                })
+                .catch((error) => {
+                  Toastify({
+                    text: error.message,
+                    duration: 3000,
+                    gravity: 'top',
+                    position: 'right',
+                    backgroundColor: '#f56565', // Red
+                  }).showToast();
+                });
+            }
           </script>
           <!-- Task Cards -->
           <div class="space-y-3 task-list" data-list-id="<%= list._id %>">
