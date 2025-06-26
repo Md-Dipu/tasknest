@@ -78,6 +78,34 @@ app.use('/lists', listRoutes);
 app.use('/tasks', taskRoutes);
 
 /**
+ * Handle 404 errors
+ */
+app.use((req, res) => {
+  res.status(404).render('404', { user: req.user });
+});
+
+/**
+ * Global error handler - Handle 500 errors
+ */
+app.use((err, req, res, _) => {
+  console.error(colors.red.bold('Server Error:', err));
+
+  // Set default error status if not set
+  const status = err.status || err.statusCode || 500;
+
+  // Don't expose error details in production
+  const errorMessage =
+    process.env.NODE_ENV === 'production'
+      ? 'Something went wrong!'
+      : err.message;
+
+  res.status(status).render('500', {
+    user: req.user,
+    error: errorMessage,
+  });
+});
+
+/**
  * Connect to the database and start the server
  */
 async function startServer() {
@@ -93,20 +121,5 @@ async function startServer() {
 }
 
 startServer();
-
-/**
- * Handle 404 errors
- */
-app.use((req, res) => {
-  res.status(404).render('404', { user: req.user });
-});
-
-/**
- * Handle 500 errors
- */
-app.use((err, req, res, next) => {
-  console.error(colors.red.bold('Server Error:', err));
-  res.status(500).render('500', { user: req.user, error: err.message });
-});
 
 module.exports = app;

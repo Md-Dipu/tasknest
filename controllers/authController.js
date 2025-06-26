@@ -103,12 +103,9 @@ exports.login = passport.authenticate('local', {
   failureFlash: false,
 });
 
-exports.logout = (req, res) => {
+exports.logout = (req, res, next) => {
   req.logout((err) => {
-    if (err) {
-      console.error(err);
-      throw new Error('Logout failed');
-    }
+    if (err) return next(err);
     res.redirect('/');
   });
 };
