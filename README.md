@@ -28,8 +28,7 @@
 
 ## Demo
 
-Check out the live demo of tasknest: [Tasknest Demo](https://your-demo-link.com)  
-_(Replace with the actual demo link if available.)_
+Check out the live demo of tasknest: [Tasknest Demo](https://tasknest-vh5b.onrender.com/)
 
 ## Installation
 
